@@ -10,12 +10,14 @@ import com.example.medipets.model.data.entities.FormularioServicioEntity
 @Database(
     entities = [FormularioServicioEntity::class],
     version = 1,
-    exportSchema = false
+    exportSchema = false // Buena práctica para evitar warnings
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun formularioServicio(): FormularioServicioDao
+    // ✅ ¡ESTA ES LA LÍNEA QUE DEBES AÑADIR EN ESTE ARCHIVO! ✅
+    abstract fun formularioServicioDao(): FormularioServicioDao
 
+    // Y el companion object para crear la base de datos
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
