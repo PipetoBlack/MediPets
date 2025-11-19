@@ -1,18 +1,19 @@
 package com.example.medipets.viewmodel
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medipets.model.domain.FormularioServicioUIState
+//1. IMPORTANTE: Importa la clase R para poder acceder a los recursos como R.string...
+import com.example.medipets.R
 import com.example.medipets.model.data.entities.FormularioServicioEntity
 import com.example.medipets.model.data.repository.FormularioServicioRepository
+import com.example.medipets.model.domain.FormularioServicioUIState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class HomeViewModel (private val repository: FormularioServicioRepository) : ViewModel() {
+class HomeViewModel(private val repository: FormularioServicioRepository) : ViewModel() {
 
     private val _estado = MutableStateFlow(FormularioServicioUIState())
     val estado: StateFlow<FormularioServicioUIState> = _estado.asStateFlow()
@@ -22,7 +23,8 @@ class HomeViewModel (private val repository: FormularioServicioRepository) : Vie
             actual.copy(
                 nombreCliente = valor,
                 errores = actual.errores.copy(
-                    nombreCliente = if (valor.isBlank()) "El nombre es obligatorio" else null
+                    // 3. CORRECCIÓN: Asigna el ID del recurso (Int) en lugar de un String
+                    nombreCliente = if (valor.isBlank()) R.string.error_campo_obligatorio else null
                 )
             )
         }
@@ -33,9 +35,10 @@ class HomeViewModel (private val repository: FormularioServicioRepository) : Vie
             actual.copy(
                 correoCliente = valor,
                 errores = actual.errores.copy(
+                    // 3. CORRECCIÓN: Asigna los IDs de los recursos para cada caso de error
                     correoCliente = when {
-                        valor.isBlank() -> "El correo es obligatorio"
-                        !EMAIL_REGEX.matches(valor) -> "Formato de correo no válido"
+                        valor.isBlank() -> R.string.error_campo_obligatorio
+                        !EMAIL_REGEX.matches(valor) -> R.string.error_formato_correo
                         else -> null
                     }
                 )
@@ -48,43 +51,43 @@ class HomeViewModel (private val repository: FormularioServicioRepository) : Vie
             actual.copy(
                 region = valor,
                 errores = actual.errores.copy(
-                    region = if (valor.isBlank()) "La región es obligatoria" else null
+                    // 3. CORRECCIÓN: Asigna el ID del recurso
+                    region = if (valor.isBlank()) R.string.error_region_obligatoria else null
                 )
             )
         }
     }
 
     fun onEnviarFormulario() {
-        val ui = _estado.value
+        // 4. MEJORA: Re-valida todos los campos para asegurar que el estado de error esté actualizado
+        onNombreChange(_estado.value.nombreCliente)
+        onCorreoChange(_estado.value.correoCliente)
+        onRegionChange(_estado.value.region)
 
-        // Validaciones básicas
-        val errores = ui.errores.copy(
-            nombreCliente = if (ui.nombreCliente.isBlank()) "El nombre es obligatorio" else null,
-            correoCliente = if (ui.correoCliente.isBlank()) "El correo es obligatorio" else null,
-            region = if (ui.region.isBlank()) "La región es obligatoria" else null
-        )
+        // Se accede al valor más reciente del estado para la comprobación.
+        val estadoActual = _estado.value
 
-        // Actualiza errores en UI
-        _estado.update { it.copy(errores = errores) }
+        // Si la función tieneErrores() devuelve true, significa que hay un error y no continuamos.
+        if (estadoActual.errores.tieneErrores()) {
+            return
+        }
 
-        // Si hay errores, no persistir
-        if (errores.tieneErrores()) return
-
-        // Persistir en SQLite (Room)
+        // Si no hay errores, procedemos a guardar en la base de datos
         viewModelScope.launch {
             val entity = FormularioServicioEntity(
-                nombreCliente = ui.nombreCliente,
-                correoCliente = ui.correoCliente,
-                region = ui.region
+                nombreCliente = estadoActual.nombreCliente,
+                correoCliente = estadoActual.correoCliente,
+                region = estadoActual.region
             )
             repository.guardarFormulario(entity)
 
-            // Opcional: limpiar formulario
+            // Opcional: Limpiar el formulario para un nuevo ingreso
             _estado.update { FormularioServicioUIState() }
         }
     }
 
     companion object {
+        // Expresión regular para validar el formato de un correo electrónico
         private val EMAIL_REGEX =
             "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
     }
