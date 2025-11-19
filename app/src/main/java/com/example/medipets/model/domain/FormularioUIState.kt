@@ -1,4 +1,4 @@
-package com.example.medipets.model
+package com.example.medipets.model.domain
 
 data class FormularioServicioUIState(
     val nombreCliente: String = "",
