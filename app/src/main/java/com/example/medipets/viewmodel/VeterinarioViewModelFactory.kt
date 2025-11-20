@@ -10,7 +10,7 @@ class VeterinarioViewModelFactory(
     private val context: Context
 ) : ViewModelProvider.Factory {
 
-    override fun <T : ViewModel> create(modelClass: Class<T): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(VeterinarioViewModel::class.java)) {
 
             val db = AppDatabase.getDatabase(context)
