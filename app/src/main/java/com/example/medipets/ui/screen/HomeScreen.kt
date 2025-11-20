@@ -23,7 +23,8 @@ import androidx.compose.ui.unit.dp
 fun HomeScreen(
     userName: String,
     onLogoutClick: () -> Unit,
-    onAgendarClick: () -> Unit
+    onAgendarClick: () -> Unit,
+    onVeterinarioClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -75,6 +76,17 @@ fun HomeScreen(
                     .padding(horizontal = 32.dp)
             ) {
                 Text(text = "Agendar Cita", style = MaterialTheme.typography.titleMedium)
+            }
+
+            Spacer(modifier = Modifier.padding(8.dp))
+
+            Button(
+                onClick = onVeterinarioClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp)
+            ) {
+                Text(text = "Registro Veterinario", style = MaterialTheme.typography.titleMedium)
             }
         }
     }
