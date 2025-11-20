@@ -1,10 +1,17 @@
 package com.example.medipets.navigation
 
+import android.app.Application
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.medipets.model.data.config.AppDatabase
+import com.example.medipets.model.data.repository.FormularioCitaMascotaRepository
 import com.example.medipets.ui.screen.*
+import com.example.medipets.viewmodel.FormularioCitaMascotaViewModel
+import com.example.medipets.viewmodel.FormularioCitaMascotaViewModelFactory
 
 @Composable
 fun AppNavigation() {
@@ -49,8 +56,8 @@ fun AppNavigation() {
                 onLogoutClick = {
                     navController.navigate("menu") { popUpTo("home") { inclusive = true } }
                 },
-                onAgendarClick = { /* Lógica futura para agendar */ },
-                onVeterinarioClick = {navController.navigate("veterinario")}
+                onAgendarClick = { navController.navigate("CitaMascota") },
+                onVeterinarioClick = { navController.navigate("veterinario") }
             )
         }
 
@@ -61,6 +68,19 @@ fun AppNavigation() {
                 .create(com.example.medipets.viewmodel.VeterinarioViewModel::class.java)
 
             VeterinarioProfileScreen(viewModel = viewModel)
+        }
+        // Pantalla de ingreso de Formulario cita
+        composable("CitaMascota") {
+            val application = LocalContext.current.applicationContext as Application
+            val dao = AppDatabase.getDatabase(application).formularioCitaMascotaDao()
+            val repository = FormularioCitaMascotaRepository(dao)
+            val factory = FormularioCitaMascotaViewModelFactory(repository)
+            val viewModel: FormularioCitaMascotaViewModel = viewModel(factory = factory)
+
+            FormularioCitaMascotaScreen(
+                navController = navController,
+                viewModel = viewModel
+            )
         }
     }
 }

@@ -5,19 +5,26 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.medipets.model.data.dao.FormularioServicioDao
+import com.example.medipets.model.data.entities.FormularioCitaMascotaEntity
 import com.example.medipets.model.data.entities.FormularioServicioEntity
 import com.example.medipets.model.data.entities.VeterinarioEntity
 import com.example.medipets.model.data.dao.VeterinarioDao
+import com.example.medipets.model.data.dao.FormularioCitaMascotaDao
 
 @Database(
-    entities = [FormularioServicioEntity::class, VeterinarioEntity::class],
-    version = 2,
+    entities = [FormularioServicioEntity::class,
+                FormularioCitaMascotaEntity::class,
+                VeterinarioEntity::class
+               ],
+    version = 3, // Si cambias el esquema, aumenta el número de versión
     exportSchema = false // Buena práctica para evitar warnings
 )
 abstract class AppDatabase : RoomDatabase() {
 
     // ¡ESTA ES LA LÍNEA QUE DEBES AÑADIR EN ESTE ARCHIVO!
     abstract fun formularioServicioDao(): FormularioServicioDao
+    abstract fun formularioCitaMascotaDao(): FormularioCitaMascotaDao
+
     abstract fun veterinarioDao(): VeterinarioDao
 
     // Y el companion object para crear la base de datos
