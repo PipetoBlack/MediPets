@@ -14,7 +14,8 @@ fun InputText(
     valor: String,
     @StringRes error: Int?, // ACEPTA: Un ID de recurso de tipo Int (que puede ser nulo)
     label: String,
-    onChange: (String) -> Unit
+    onChange: (String) -> Unit,
+    enabled: Boolean = true //esto es para el calendario del formulario de citas
 ) {
     OutlinedTextField(
         value = valor,
@@ -23,6 +24,7 @@ fun InputText(
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
         isError = error != null, // La caja se pone roja si el error no es nulo
+        enabled = enabled,
         supportingText = {
             if (error != null) {
                 // USA stringResource para "traducir" el ID al texto real
