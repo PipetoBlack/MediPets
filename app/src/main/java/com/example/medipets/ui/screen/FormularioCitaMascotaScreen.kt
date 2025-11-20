@@ -1,36 +1,32 @@
 package com.example.medipets.ui.screen
 
-// --- IMPORTS NECESARIOS ---
-// Estos imports son nuevos y necesarios para la conexión.
 import android.app.Application
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.medipets.model.data.config.AppDatabase
-import com.example.medipets.model.data.repository.FormularioCitaMascotaRepository
-import com.example.medipets.viewmodel.FormularioCitaMascotaViewModel
-import com.example.medipets.viewmodel.FormularioCitaMascotaViewModelFactory
-import androidx.compose.ui.platform.LocalContext
-// --- IMPORTS QUE YA TENÍAS ---
-import com.example.medipets.ui.components.InputText
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medipets.model.data.config.AppDatabase
+import com.example.medipets.model.domain.FormularioCitaMascotaUIState
+import com.example.medipets.model.data.repository.FormularioCitaMascotaRepository
+import com.example.medipets.ui.components.InputText
+import com.example.medipets.viewmodel.FormularioCitaMascotaViewModel
+import com.example.medipets.viewmodel.FormularioCitaMascotaViewModelFactory
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormularioCitaMascotaScreen() {
 
-    // --- 1. CREACIÓN DEL VIEWMODEL ---
-    // Aquí se crea la instancia del "cerebro" de la pantalla.
     val context = LocalContext.current
     val viewModel: FormularioCitaMascotaViewModel = viewModel(
         factory = FormularioCitaMascotaViewModelFactory(
@@ -39,10 +35,31 @@ fun FormularioCitaMascotaScreen() {
             )
         )
     )
-
-    // --- 2. OBSERVACIÓN DEL ESTADO ---
-    // `uiState` ahora es una "foto" viva del estado del ViewModel.
     val uiState by viewModel.uiState.collectAsState()
+
+    // --- Lógica del Calendario (DatePicker) ---
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = System.currentTimeMillis()
+    )
+
+    if (uiState.mostrarDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { viewModel.onDismissDatePicker() },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let {
+                        viewModel.onDateSelected(it)
+                    }
+                }) { Text("Aceptar") }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.onDismissDatePicker() }) { Text("Cancelar") }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
 
     Scaffold(
         topBar = {
@@ -57,41 +74,44 @@ fun FormularioCitaMascotaScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
-            // --- 3. CONEXIÓN DE LOS CAMPOS DE TEXTO ---
-            // Cada InputText ahora está vinculado al uiState y al ViewModel.
+            // ... (Tus otros InputText para nombre, raza, edad) ...
             InputText(
                 valor = uiState.nombreMascota,
                 error = uiState.errores.nombreMascota,
                 label = "Nombre de la mascota",
-                onChange = { viewModel.onNombreMascotaChange(it) }
+                onChange = viewModel::onNombreMascotaChange // Forma más corta de escribirlo
             )
-
             InputText(
                 valor = uiState.raza,
                 error = uiState.errores.raza,
                 label = "Raza",
-                onChange = { viewModel.onRazaChange(it) }
+                onChange = viewModel::onRazaChange
             )
-
             InputText(
                 valor = uiState.edad,
                 error = uiState.errores.edad,
                 label = "Edad",
-                onChange = { viewModel.onEdadChange(it) }
+                onChange = viewModel::onEdadChange
             )
 
-            InputText(
-                valor = uiState.fecha,
-                error = uiState.errores.fecha,
-                label = "Fecha de la cita (dd/mm/aaaa)",
-                onChange = { viewModel.onFechaChange(it) }
-            )
+            // --- CAMPO DE FECHA MEJORADO (USANDO TU INPUTTEXT ACTUAL) ---
+            // Envolvemos tu InputText en un Box que captura el clic.
+            Box(modifier = Modifier.clickable { viewModel.onShowDatePicker() }) {
+                // Tu InputText se usa aquí, pero deshabilitado a nivel de UI.
+                // Sigue mostrando el valor y el error perfectamente.
+                InputText(
+                    valor = uiState.fecha,
+                    error = uiState.errores.fecha,
+                    label = "Fecha de la cita",
+                    onChange = { }, // Se deja vacío porque el clic lo maneja el Box
+                    enabled = false
+                )
+            }
 
-            // Este campo usa OutlinedTextField para 'maxLines', también conectado.
+
             OutlinedTextField(
                 value = uiState.motivo,
-                onValueChange = { viewModel.onMotivoChange(it) },
+                onValueChange = viewModel::onMotivoChange,
                 label = { Text("Motivo de la consulta") },
                 isError = uiState.errores.motivo != null,
                 modifier = Modifier.fillMaxWidth(),
@@ -100,9 +120,8 @@ fun FormularioCitaMascotaScreen() {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // --- 4. CONEXIÓN DEL BOTÓN ---
             Button(
-                onClick = { viewModel.guardarCita() },
+                onClick = viewModel::guardarCita,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("GUARDAR CITA")

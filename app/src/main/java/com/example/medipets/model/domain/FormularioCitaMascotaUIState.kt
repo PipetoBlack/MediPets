@@ -10,7 +10,10 @@ data class FormularioCitaMascotaUIState(
     val edad: String = "", // Usamos String para el campo de texto
     val fecha: String = "",
     val motivo: String = "",
-    val errores: CitaMascotaErrores = CitaMascotaErrores()
+    val errores: CitaMascotaErrores = CitaMascotaErrores(),
+
+    val mostrarDatePicker: Boolean = false
+
 )
 
 // Guarda los posibles errores de validación de cada campo.
@@ -19,5 +22,5 @@ data class CitaMascotaErrores(
     @StringRes val raza: Int? = null,
     @StringRes val edad: Int? = null,
     @StringRes val fecha: Int? = null,
-    @StringRes val motivo: Int? = null
+    @StringRes val motivo: Int? = null,
 )
