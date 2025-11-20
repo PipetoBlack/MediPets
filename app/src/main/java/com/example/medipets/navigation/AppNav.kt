@@ -1,134 +1,86 @@
 package com.example.medipets.navigation
 
-
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.*
-import com.example.medipets.ui.screen.FormularioServicioScreen
-import com.example.medipets.ui.screen.LoginScreen
-import com.example.medipets.ui.screen.StartScreen
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-
-object Routes {
-    const val Login = "login"
-    const val Start = "start"
-    const val Form = "form"
-}
+import android.app.Application
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.medipets.model.data.config.AppDatabase
+import com.example.medipets.model.data.repository.FormularioCitaMascotaRepository
+import com.example.medipets.ui.screen.*
+import com.example.medipets.viewmodel.FormularioCitaMascotaViewModel
+import com.example.medipets.viewmodel.FormularioCitaMascotaViewModelFactory
 
 @Composable
-fun AppNav() {
-    val nav = rememberNavController()
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
+fun AppNavigation() {
+    val navController = rememberNavController()
 
-    NavHost(navController = nav, startDestination = Routes.Login) {
-        // LOGIN
-        composable(Routes.Login) {
+    NavHost(navController = navController, startDestination = "menu") {
+
+        // Pantalla del Menú de Inicio
+        composable("menu") {
+            MenuInicioScreen(
+                onLoginClick = { navController.navigate("login") },
+                onRegisterClick = { navController.navigate("register") }
+            )
+        }
+
+        // Pantalla de Login
+        composable("login") {
             LoginScreen(
-                onAuthenticated = {
-                    nav.navigate(Routes.Start) {
-                        popUpTo(Routes.Login) { inclusive = true } // limpia login del back stack
-                        launchSingleTop = true
-                    }
+                onLoginClick = {
+                    navController.navigate("home") { popUpTo("menu") { inclusive = true } }
+                },
+                onNavigateToRegister = {
+                    navController.navigate("register") // Esta es la navegación clave
                 }
             )
         }
 
-        // SHELL (drawer + scaffold)
-        navigation(startDestination = Routes.Start, route = "main_shell") {
-            composable(Routes.Start) {
-                DrawerScaffold(
-                    currentRoute = Routes.Start,
-                    onNavigate = { nav.navigate(it) },
-                    drawerState = drawerState,
-                    scope = scope
-                ) {
-                    StartScreen()
+        // Pantalla de Registro
+        composable("register") {
+            RegisterScreen(
+                onBackClick = { navController.popBackStack() }, // Volver a la pantalla anterior
+                onLoginClick = {
+                    navController.navigate("login") { popUpTo("register") { inclusive = true } }
                 }
-            }
-            composable(Routes.Form) {
-                DrawerScaffold(
-                    currentRoute = Routes.Form,
-                    onNavigate = { nav.navigate(it) },
-                    drawerState = drawerState,
-                    scope = scope
-                ) {
-                    FormularioServicioScreen()
-                }
-            }
+            )
+        }
+
+        // Pantalla de Home
+        composable("home") {
+            HomeScreen(
+                userName = "Felipe",
+                onLogoutClick = {
+                    navController.navigate("menu") { popUpTo("home") { inclusive = true } }
+                },
+                onAgendarClick = { navController.navigate("CitaMascota") },
+                onVeterinarioClick = { navController.navigate("veterinario") }
+            )
+        }
+
+        // Pantalla de ingreso de Veterinario
+        composable("veterinario") {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val viewModel = com.example.medipets.viewmodel.VeterinarioViewModelFactory(context)
+                .create(com.example.medipets.viewmodel.VeterinarioViewModel::class.java)
+
+            VeterinarioProfileScreen(viewModel = viewModel)
+        }
+        // Pantalla de ingreso de Formulario cita
+        composable("CitaMascota") {
+            val application = LocalContext.current.applicationContext as Application
+            val dao = AppDatabase.getDatabase(application).formularioCitaMascotaDao()
+            val repository = FormularioCitaMascotaRepository(dao)
+            val factory = FormularioCitaMascotaViewModelFactory(repository)
+            val viewModel: FormularioCitaMascotaViewModel = viewModel(factory = factory)
+
+            FormularioCitaMascotaScreen(
+                navController = navController,
+                viewModel = viewModel
+            )
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun DrawerScaffold(
-    currentRoute: String,
-    onNavigate: (String) -> Unit,
-    drawerState: DrawerState,
-    scope: CoroutineScope,
-    content: @Composable () -> Unit
-) {
-    val destinations = listOf(
-        DrawerItem("Inicio", Routes.Start),
-        DrawerItem("Formulario de servicio", Routes.Form)
-    )
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                Text(
-                    "Menú",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(16.dp)
-                )
-                destinations.forEach { item ->
-                    NavigationDrawerItem(
-                        label = { Text(item.label) },
-                        selected = currentRoute == item.route,
-                        onClick = {
-                            scope.launch { drawerState.close() }
-                            if (currentRoute != item.route) {
-                                onNavigate(item.route)
-                            }
-                        },
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
-                }
-            }
-        }
-    ) {
-        Scaffold(
-            topBar = {
-                SmallTopAppBar(
-                    title = { Text(appBarTitle(currentRoute)) },
-                    navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menú")
-                        }
-                    }
-                )
-            }
-        ) { padding ->
-            Surface(Modifier.padding(padding)) {
-                content()
-            }
-        }
-    }
-}
-
-private data class DrawerItem(val label: String, val route: String)
-
-@Composable
-private fun appBarTitle(route: String?): String = when (route) {
-    Routes.Start -> "Inicio"
-    Routes.Form  -> "Formulario de Servicio"
-    else         -> ""
 }

@@ -7,9 +7,11 @@ import com.example.medipets.model.data.entities.FormularioCitaMascotaEntity
 import com.example.medipets.model.data.repository.FormularioCitaMascotaRepository
 import com.example.medipets.model.domain.CitaMascotaErrores
 import com.example.medipets.model.domain.FormularioCitaMascotaUIState
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -20,37 +22,33 @@ class FormularioCitaMascotaViewModel(private val repository: FormularioCitaMasco
 
     private val _uiState = MutableStateFlow(FormularioCitaMascotaUIState())
     val uiState: StateFlow<FormularioCitaMascotaUIState> = _uiState.asStateFlow()
+    private val _eventoCanal = Channel<Evento>()
+    val eventoFlujo = _eventoCanal.receiveAsFlow()
+    sealed class Evento {
+        data class MostrarSnackbar(val mensaje: String) : Evento()
+        object NavegarAHome : Evento() // El nuevo evento de navegación
+    }
 
-    // --- Lógica para el calendario ---
-
-    // ✅ 1. Función para decirle a la UI que MUESTRE el calendario
+    // Lógica del calendario
     fun onShowDatePicker() {
         _uiState.update { it.copy(mostrarDatePicker = true) }
     }
 
-    // ✅ 2. Función para decirle a la UI que OCULTE el calendario
     fun onDismissDatePicker() {
         _uiState.update { it.copy(mostrarDatePicker = false) }
     }
-
-    // ✅ 3. Función para recibir la fecha seleccionada del calendario
-    // El 'Long' es el timestamp en milisegundos que nos da el DatePicker
     fun onDateSelected(millis: Long) {
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val dateString = formatter.format(Date(millis))
 
-        // Actualizamos el estado con la nueva fecha y limpiamos el error
         _uiState.update {
             it.copy(
                 fecha = dateString,
                 errores = it.errores.copy(fecha = null),
-                mostrarDatePicker = false // Ocultamos el diálogo después de seleccionar
+                mostrarDatePicker = false
             )
         }
     }
-
-
-    // --- Funciones 'onChange' para los otros campos (sin cambios) ---
 
     fun onNombreMascotaChange(valor: String) {
         _uiState.update { it.copy(nombreMascota = valor, errores = it.errores.copy(nombreMascota = null)) }
@@ -87,6 +85,8 @@ class FormularioCitaMascotaViewModel(private val repository: FormularioCitaMasco
                 repository.insert(nuevaCita)
                 limpiarFormulario()
 
+                _eventoCanal.send(Evento.MostrarSnackbar("¡Cita guardada con éxito!"))
+                _eventoCanal.send(Evento.NavegarAHome)
             }
         }
     }

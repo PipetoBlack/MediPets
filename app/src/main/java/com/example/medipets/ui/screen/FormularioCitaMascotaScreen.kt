@@ -11,37 +11,45 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.medipets.model.data.config.AppDatabase
-import com.example.medipets.model.domain.FormularioCitaMascotaUIState
-import com.example.medipets.model.data.repository.FormularioCitaMascotaRepository
+import androidx.navigation.NavController
 import com.example.medipets.ui.components.InputText
 import com.example.medipets.viewmodel.FormularioCitaMascotaViewModel
-import com.example.medipets.viewmodel.FormularioCitaMascotaViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormularioCitaMascotaScreen() {
-
-    val context = LocalContext.current
-    val viewModel: FormularioCitaMascotaViewModel = viewModel(
-        factory = FormularioCitaMascotaViewModelFactory(
-            FormularioCitaMascotaRepository(
-                AppDatabase.getDatabase(context.applicationContext as Application).formularioCitaMascotaDao()
-            )
-        )
-    )
+fun FormularioCitaMascotaScreen(
+    navController: NavController,
+    viewModel: FormularioCitaMascotaViewModel
+) {
     val uiState by viewModel.uiState.collectAsState()
 
-    // --- Lógica del Calendario (DatePicker) ---
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Este bloque se ejecuta de forma segura solo una vez cuando la pantalla aparece.
+    LaunchedEffect(key1 = Unit) {
+        viewModel.eventoFlujo.collectLatest { evento ->
+            when (evento) {
+                is FormularioCitaMascotaViewModel.Evento.MostrarSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        message = evento.mensaje,
+                        duration = SnackbarDuration.Short
+                    )
+                }
+                is FormularioCitaMascotaViewModel.Evento.NavegarAHome -> {
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = true }
+                    }
+                }
+            }
+        }
+    }
+
+    // lgica del Calendario (DatePicker)
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = System.currentTimeMillis()
     )
-
     if (uiState.mostrarDatePicker) {
         DatePickerDialog(
             onDismissRequest = { viewModel.onDismissDatePicker() },
@@ -60,8 +68,8 @@ fun FormularioCitaMascotaScreen() {
         }
     }
 
-
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(title = { Text("Agendar Cita para Mascota") })
         }
@@ -74,12 +82,11 @@ fun FormularioCitaMascotaScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ... (Tus otros InputText para nombre, raza, edad) ...
             InputText(
                 valor = uiState.nombreMascota,
                 error = uiState.errores.nombreMascota,
                 label = "Nombre de la mascota",
-                onChange = viewModel::onNombreMascotaChange // Forma más corta de escribirlo
+                onChange = viewModel::onNombreMascotaChange
             )
             InputText(
                 valor = uiState.raza,
@@ -94,20 +101,15 @@ fun FormularioCitaMascotaScreen() {
                 onChange = viewModel::onEdadChange
             )
 
-            // --- CAMPO DE FECHA MEJORADO (USANDO TU INPUTTEXT ACTUAL) ---
-            // Envolvemos tu InputText en un Box que captura el clic.
             Box(modifier = Modifier.clickable { viewModel.onShowDatePicker() }) {
-                // Tu InputText se usa aquí, pero deshabilitado a nivel de UI.
-                // Sigue mostrando el valor y el error perfectamente.
                 InputText(
                     valor = uiState.fecha,
                     error = uiState.errores.fecha,
                     label = "Fecha de la cita",
-                    onChange = { }, // Se deja vacío porque el clic lo maneja el Box
+                    onChange = { },
                     enabled = false
                 )
             }
-
 
             OutlinedTextField(
                 value = uiState.motivo,
