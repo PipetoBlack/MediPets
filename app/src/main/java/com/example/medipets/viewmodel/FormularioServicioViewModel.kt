@@ -2,7 +2,6 @@ package com.example.medipets.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-//1. IMPORTANTE: Importa la clase R para poder acceder a los recursos como R.string...
 import com.example.medipets.R
 import com.example.medipets.model.data.entities.FormularioServicioEntity
 import com.example.medipets.model.data.repository.FormularioServicioRepository
@@ -23,7 +22,6 @@ class HomeViewModel(private val repository: FormularioServicioRepository) : View
             actual.copy(
                 nombreCliente = valor,
                 errores = actual.errores.copy(
-                    // 3. CORRECCIÓN: Asigna el ID del recurso (Int) en lugar de un String
                     nombreCliente = if (valor.isBlank()) R.string.error_campo_obligatorio else null
                 )
             )
@@ -35,7 +33,6 @@ class HomeViewModel(private val repository: FormularioServicioRepository) : View
             actual.copy(
                 correoCliente = valor,
                 errores = actual.errores.copy(
-                    // 3. CORRECCIÓN: Asigna los IDs de los recursos para cada caso de error
                     correoCliente = when {
                         valor.isBlank() -> R.string.error_campo_obligatorio
                         !EMAIL_REGEX.matches(valor) -> R.string.error_formato_correo
@@ -51,7 +48,6 @@ class HomeViewModel(private val repository: FormularioServicioRepository) : View
             actual.copy(
                 region = valor,
                 errores = actual.errores.copy(
-                    // 3. CORRECCIÓN: Asigna el ID del recurso
                     region = if (valor.isBlank()) R.string.error_region_obligatoria else null
                 )
             )
@@ -59,7 +55,6 @@ class HomeViewModel(private val repository: FormularioServicioRepository) : View
     }
 
     fun onEnviarFormulario() {
-        // 4. MEJORA: Re-valida todos los campos para asegurar que el estado de error esté actualizado
         onNombreChange(_estado.value.nombreCliente)
         onCorreoChange(_estado.value.correoCliente)
         onRegionChange(_estado.value.region)

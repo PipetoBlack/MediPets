@@ -28,14 +28,12 @@ import androidx.compose.ui.unit.dp
 // Cambiamos el nombre de `onBackClick` para que sea más descriptivo de su futura función.
 fun LoginScreen(onLoginClick: () -> Unit, onNavigateToRegister: () -> Unit) {
     val context = LocalContext.current
-
-    // Tus variables de estado están perfectas.
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
-    // Función de validación interna. Muy bien implementada.
+    // Función de validación interna
     fun validarLogin(): Boolean {
         if (!email.contains("@") || !email.contains(".")) {
             errorMessage = "Correo inválido. Debe contener '@' y un dominio."
@@ -45,7 +43,6 @@ fun LoginScreen(onLoginClick: () -> Unit, onNavigateToRegister: () -> Unit) {
             errorMessage = "La contraseña debe tener al menos 6 caracteres."
             return false
         }
-        // Si la validación pasa, limpiamos el mensaje de error.
         errorMessage = ""
         return true
     }
@@ -60,19 +57,19 @@ fun LoginScreen(onLoginClick: () -> Unit, onNavigateToRegister: () -> Unit) {
         Text("Iniciar sesión en MediPet", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Campo de Email (sin cambios)
+        // Campo de Email
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
             label = { Text("Correo electrónico") },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.fillMaxWidth() // Ocupa todo el ancho para un mejor look
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo de Contraseña (sin cambios)
+        // Campo de Contraseña
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -86,10 +83,10 @@ fun LoginScreen(onLoginClick: () -> Unit, onNavigateToRegister: () -> Unit) {
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth() // Ocupa todo el ancho
+            modifier = Modifier.fillMaxWidth()
         )
 
-        // Muestra el mensaje de error si existe, justo debajo del campo relevante.
+        
         if (errorMessage.isNotEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(

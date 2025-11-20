@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun MenuInicioScreen(
     onLoginClick: () -> Unit,
-    onRegisterClick: () -> Unit // <-- La pantalla recibe la orden correctamente.
+    onRegisterClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -28,7 +28,6 @@ fun MenuInicioScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Puedes agregar un logo o título aquí si quieres
         Text(
             text = "Bienvenido a MediPet",
             style = MaterialTheme.typography.headlineLarge
@@ -45,11 +44,9 @@ fun MenuInicioScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // --- ¡EL PROBLEMA ESTÁ AQUÍ SEGURAMENTE! ---
         // Botón para Crear Cuenta / Registrarse
         Button(
-            // Asegúrate de que el onClick esté llamando a onRegisterClick
-            onClick = onRegisterClick, // <-- ¡ESTA ES LA CONEXIÓN CLAVE!
+            onClick = onRegisterClick,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Crear Cuenta")

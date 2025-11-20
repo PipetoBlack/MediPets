@@ -37,8 +37,6 @@ fun HomeScreen(
                     )
                 },
                 actions = {
-                    // --- ¡AQUÍ ESTÁ LA MODIFICACIÓN! ---
-
                     // Usamos un TextButton para que toda el área (icono + texto) sea clickeable.
                     TextButton(onClick = onLogoutClick) {
                         Row( // Organizamos el icono y el texto horizontalmente.

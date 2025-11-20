@@ -18,7 +18,7 @@ import com.example.medipets.viewmodel.HomeViewModelFactory
 @Composable
 fun FormularioServicioScreen() {
 
-    // ✅ Crear correctamente el ViewModel usando el Factory
+    // Crear correctamente el ViewModel usando el Factory
     val context = androidx.compose.ui.platform.LocalContext.current
     val viewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(context.applicationContext as Application)
@@ -95,7 +95,7 @@ fun FormularioServicioScreen() {
                 supportingText = {
                     estado.errores.region?.let { errorId -> // 'errorId' es el Int
                         Text(
-                            text = stringResource(id = errorId), // ✅ Traduce el ID a texto
+                            text = stringResource(id = errorId), //  Traduce el ID a texto
                             color = MaterialTheme.colorScheme.error
                         )
                     }

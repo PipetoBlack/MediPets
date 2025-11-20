@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 @Composable
 fun InputText(
     valor: String,
-    @StringRes error: Int?, // ✅ ACEPTA: Un ID de recurso de tipo Int (que puede ser nulo)
+    @StringRes error: Int?, // ACEPTA: Un ID de recurso de tipo Int (que puede ser nulo)
     label: String,
     onChange: (String) -> Unit
 ) {
@@ -25,7 +25,7 @@ fun InputText(
         isError = error != null, // La caja se pone roja si el error no es nulo
         supportingText = {
             if (error != null) {
-                // ✅ USA stringResource para "traducir" el ID al texto real
+                // USA stringResource para "traducir" el ID al texto real
                 Text(
                     text = stringResource(id = error),
                     color = MaterialTheme.colorScheme.error
