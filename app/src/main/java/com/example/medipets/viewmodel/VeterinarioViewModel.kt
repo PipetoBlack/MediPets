@@ -82,6 +82,24 @@ class VeterinarioViewModel(
         }
     }
 
+    fun insertarVeterinario(
+        nombre: String,
+        especialidad: String,
+        correo: String,
+        telefono: String
+    ) {
+        // Actualizamos el estado con lo que hay en la pantalla
+        _estado.value = VeterinarioUIState(
+            nombre = nombre,
+            especialidad = especialidad,
+            correo = correo,
+            telefono = telefono
+        )
+
+        // Reutilizamos toda la lógica que ya tenemos
+        onGuardarVeterinario()
+    }
+
     // Guardar veterinario
 
     fun onGuardarVeterinario() {
