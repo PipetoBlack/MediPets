@@ -49,8 +49,18 @@ fun AppNavigation() {
                 onLogoutClick = {
                     navController.navigate("menu") { popUpTo("home") { inclusive = true } }
                 },
-                onAgendarClick = { /* Lógica futura para agendar */ }
+                onAgendarClick = { /* Lógica futura para agendar */ },
+                onVeterinarioClick = {navController.navigate("veterinario")}
             )
+        }
+
+        // Pantalla de ingreso de Veterinario
+        composable("veterinario") {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val viewModel = com.example.medipets.viewmodel.VeterinarioViewModelFactory(context)
+                .create(com.example.medipets.viewmodel.VeterinarioViewModel::class.java)
+
+            VeterinarioProfileScreen(viewModel = viewModel)
         }
     }
 }
