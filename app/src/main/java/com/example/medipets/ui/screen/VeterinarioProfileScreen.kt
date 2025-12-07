@@ -9,10 +9,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.medipets.viewmodel.VeterinarioViewModel
+import com.example.medipets.ui.components.BackButton
+import androidx.navigation.NavHostController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VeterinarioProfileScreen(
-    viewModel: VeterinarioViewModel
+    viewModel: VeterinarioViewModel,
+    navController: NavHostController
 ) {
     val veterinarios by viewModel.veterinarios.collectAsState()
     val ui by viewModel.estado.collectAsState()
@@ -41,7 +44,17 @@ fun VeterinarioProfileScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text("Perfil de Veterinario", style = MaterialTheme.typography.titleLarge)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            BackButton(onBack = { navController.popBackStack() })
+            Spacer(Modifier.width(8.dp))
+            Text(
+                "Perfil de Veterinario",
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 

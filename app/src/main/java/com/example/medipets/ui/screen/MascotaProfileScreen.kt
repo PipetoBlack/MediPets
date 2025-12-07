@@ -18,10 +18,13 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.medipets.model.data.entities.MascotaEntity
 import com.example.medipets.util.crearImagenUri
 import com.example.medipets.viewmodel.MascotaViewModel
+import com.example.medipets.ui.components.BackButton
+import androidx.navigation.NavHostController
 
 @Composable
 fun MascotaProfileScreen(
-    viewModel: MascotaViewModel
+    viewModel: MascotaViewModel,
+    navController: NavHostController
 ) {
     val estado by viewModel.estado.collectAsState()
     val mascotas by viewModel.mascotas.collectAsState()
@@ -58,7 +61,18 @@ fun MascotaProfileScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Perfil de Paciente / Mascota", style = MaterialTheme.typography.titleLarge)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            BackButton(onBack = { navController.popBackStack() })
+            Spacer(Modifier.width(8.dp))
+            Text(
+                "Perfil de Paciente / Mascota",
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
+
         Spacer(Modifier.height(16.dp))
 
         OutlinedTextField(

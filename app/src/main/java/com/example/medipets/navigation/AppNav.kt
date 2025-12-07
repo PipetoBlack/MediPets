@@ -73,7 +73,7 @@ fun AppNavigation() {
             val viewModel: VeterinarioViewModel = viewModel(
                 factory = VeterinarioViewModelFactory(context)
             )
-            VeterinarioProfileScreen(viewModel = viewModel)
+            VeterinarioProfileScreen(viewModel = viewModel, navController = navController)
         }
 
         // Pantalla de la mascota
@@ -82,7 +82,7 @@ fun AppNavigation() {
             val viewModel: MascotaViewModel = viewModel(
                 factory = MascotaViewModelFactory(context)
             )
-            MascotaProfileScreen(viewModel = viewModel)
+            MascotaProfileScreen(viewModel = viewModel, navController = navController)
         }
 
         // Pantalla de ingreso de Formulario cita
