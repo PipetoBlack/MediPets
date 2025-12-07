@@ -25,6 +25,7 @@ fun HomeScreen(
     onLogoutClick: () -> Unit,
     onAgendarClick: () -> Unit,
     onVeterinarioClick: () -> Unit
+    onPacienteClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -85,6 +86,17 @@ fun HomeScreen(
                     .padding(horizontal = 32.dp)
             ) {
                 Text(text = "Registro Veterinario", style = MaterialTheme.typography.titleMedium)
+            }
+
+            Spacer(modifier = Modifier.padding(8.dp))
+
+            Button(
+                onClick = onPacienteClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp)
+            ) {
+                Text(text = "Perfil Mascota", style = MaterialTheme.typography.titleMedium)
             }
         }
     }

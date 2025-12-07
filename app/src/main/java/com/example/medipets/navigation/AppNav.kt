@@ -12,6 +12,11 @@ import com.example.medipets.model.data.repository.FormularioCitaMascotaRepositor
 import com.example.medipets.ui.screen.*
 import com.example.medipets.viewmodel.FormularioCitaMascotaViewModel
 import com.example.medipets.viewmodel.FormularioCitaMascotaViewModelFactory
+import com.example.medipets.viewmodel.VeterinarioViewModel
+import com.example.medipets.viewmodel.VeterinarioViewModelFactory
+import com.example.medipets.viewmodel.MascotaViewModel
+import com.example.medipets.viewmodel.MascotaViewModelFactory
+import com.example.medipets.ui.screen.MascotaProfileScreen
 
 @Composable
 fun AppNavigation() {
@@ -63,12 +68,22 @@ fun AppNavigation() {
 
         // Pantalla de ingreso de Veterinario
         composable("veterinario") {
-            val context = androidx.compose.ui.platform.LocalContext.current
-            val viewModel = com.example.medipets.viewmodel.VeterinarioViewModelFactory(context)
-                .create(com.example.medipets.viewmodel.VeterinarioViewModel::class.java)
-
+            val context = LocalContext.current
+            val viewModel: VeterinarioViewModel = viewModel(
+                factory = VeterinarioViewModelFactory(context)
+            )
             VeterinarioProfileScreen(viewModel = viewModel)
         }
+
+        // Pantalla de la mascota
+        composable("paciente") {
+            val context = LocalContext.current
+            val viewModel: MascotaViewModel = viewModel(
+                factory = MascotaViewModelFactory(context)
+            )
+            MascotaProfileScreen(viewModel = viewModel)
+        }
+
         // Pantalla de ingreso de Formulario cita
         composable("CitaMascota") {
             val application = LocalContext.current.applicationContext as Application

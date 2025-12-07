@@ -10,13 +10,16 @@ import com.example.medipets.model.data.entities.FormularioServicioEntity
 import com.example.medipets.model.data.entities.VeterinarioEntity
 import com.example.medipets.model.data.dao.VeterinarioDao
 import com.example.medipets.model.data.dao.FormularioCitaMascotaDao
+import com.example.medipets.model.data.dao.MascotaDao
+import com.example.medipets.model.data.entities.MascotaEntity
 
 @Database(
     entities = [FormularioServicioEntity::class,
                 FormularioCitaMascotaEntity::class,
-                VeterinarioEntity::class
+                VeterinarioEntity::class,
+                MascotaEntity::class
                ],
-    version = 3, // Si cambias el esquema, aumenta el número de versión
+    version = 4, // Si cambias el esquema, aumenta el número de versión
     exportSchema = false // Buena práctica para evitar warnings
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -26,6 +29,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun formularioCitaMascotaDao(): FormularioCitaMascotaDao
 
     abstract fun veterinarioDao(): VeterinarioDao
+
+    abstract fun mascotaDao(): MascotaDao
 
     // Y el companion object para crear la base de datos
     companion object {
