@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.medipets.viewmodel.VeterinarioViewModel
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VeterinarioProfileScreen(
     viewModel: VeterinarioViewModel
@@ -22,6 +22,17 @@ fun VeterinarioProfileScreen(
     var especialidad by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
+
+    // Opciones de especialidad para el veterinario
+    val especialidades = listOf(
+        "Especialista en perros",
+        "Especialista en gatos",
+        "Especialista en aves",
+        "Especialista en conejos",
+        "Especialista general"
+    )
+    // Estado para abrir/cerrar el menú desplegable
+    var expanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -42,12 +53,38 @@ fun VeterinarioProfileScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
-            value = especialidad,
-            onValueChange = { especialidad = it },
-            label = { Text("Especialidad") },
-            modifier = Modifier.fillMaxWidth()
-        )
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            OutlinedTextField(
+                value = especialidad,
+                onValueChange = { },          // ya no se escribe a mano
+                readOnly = true,              // 👈 solo lectura
+                label = { Text("Especialidad") },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                modifier = Modifier
+                    .menuAnchor()             // para que el menú salga pegado al campo
+                    .fillMaxWidth()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                especialidades.forEach { opcion ->
+                    DropdownMenuItem(
+                        text = { Text(opcion) },
+                        onClick = {
+                            especialidad = opcion  // guardamos la elección
+                            expanded = false       // cerramos el menú
+                        }
+                    )
+                }
+            }
+        }
 
         OutlinedTextField(
             value = correo,
