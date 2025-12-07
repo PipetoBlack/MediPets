@@ -24,7 +24,7 @@ fun HomeScreen(
     userName: String,
     onLogoutClick: () -> Unit,
     onAgendarClick: () -> Unit,
-    onVeterinarioClick: () -> Unit
+    onVeterinarioClick: () -> Unit,
     onPacienteClick: () -> Unit
 ) {
     Scaffold(

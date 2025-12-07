@@ -62,7 +62,8 @@ fun AppNavigation() {
                     navController.navigate("menu") { popUpTo("home") { inclusive = true } }
                 },
                 onAgendarClick = { navController.navigate("CitaMascota") },
-                onVeterinarioClick = { navController.navigate("veterinario") }
+                onVeterinarioClick = { navController.navigate("veterinario") },
+                onPacienteClick = { navController.navigate("paciente") }
             )
         }
 

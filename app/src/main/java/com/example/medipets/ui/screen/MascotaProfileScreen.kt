@@ -30,7 +30,18 @@ fun MascotaProfileScreen(
 
     var currentPhotoUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Launcher para pedir permiso de cámara
+    // Launcher que toma la foto
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            viewModel.onFotoChange(currentPhotoUri?.toString())
+        } else {
+            currentPhotoUri = null
+        }
+    }
+
+    // Launcher que pide el permiso y LUEGO usa el de la foto
     val permisoCamaraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -38,17 +49,6 @@ fun MascotaProfileScreen(
             val uri = crearImagenUri(context)
             currentPhotoUri = uri
             takePictureLauncher.launch(uri)
-        }
-    }
-
-    // Launcher para tomar foto
-    val takePictureLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success) {
-            viewModel.onFotoChange(currentPhotoUri.toString())
-        } else {
-            currentPhotoUri = null
         }
     }
 
