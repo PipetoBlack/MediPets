@@ -10,6 +10,7 @@ data class MascotaEntity(
     val nombre: String,
     val tipo: String,      // Perro, Gato, etc.
     val raza: String,
-    val edad: Int?,
+    val edadAnios: Int?,
+    val edadMeses: Int?,
     val fotoUri: String?   // URI de la foto en el celular
 )

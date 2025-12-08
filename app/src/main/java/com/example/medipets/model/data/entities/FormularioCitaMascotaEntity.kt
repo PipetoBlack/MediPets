@@ -1,5 +1,4 @@
 package com.example.medipets.model.data.entities
-import com.example.medipets.model.data.entities.FormularioServicioEntity
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
@@ -8,7 +7,7 @@ import androidx.room.PrimaryKey
     tableName = "formulario_cita_mascota",
     foreignKeys = [
         ForeignKey(
-            entity = FormularioServicioEntity::class,
+            entity = UsuarioEntity::class,
             parentColumns = ["id"],
             childColumns = ["formulario_servicio_id"],
             onDelete = ForeignKey.CASCADE

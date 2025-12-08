@@ -1,6 +1,5 @@
 package com.example.medipets.ui.screen
 
-
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -9,43 +8,36 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medipets.viewmodel.LoginViewModel
+import com.example.medipets.viewmodel.LoginViewModelFactory
 
 /**
  * Pantalla de inicio de sesión.
- * @param onLoginClick Una función lambda que se ejecuta cuando el login es exitoso para navegar a la siguiente pantalla.
- * @param onNavigateToRegister Una función lambda para navegar a la pantalla de registro.
+ * @param onLoginSuccess devuelve el nombre del usuario para navegar a la pantalla Home.
+ * @param onNavigateToRegister navega a la pantalla de registro.
  */
 @Composable
-// Cambiamos el nombre de `onBackClick` para que sea más descriptivo de su futura función.
-fun LoginScreen(onLoginClick: () -> Unit, onNavigateToRegister: () -> Unit) {
+fun LoginScreen(
+    onLoginSuccess: (String) -> Unit,
+    onNavigateToRegister: () -> Unit
+) {
     val context = LocalContext.current
+
+    val viewModel: LoginViewModel = viewModel(
+        factory = LoginViewModelFactory(context.applicationContext)
+    )
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
-
-    // Función de validación interna
-    fun validarLogin(): Boolean {
-        if (!email.contains("@") || !email.contains(".")) {
-            errorMessage = "Correo inválido. Debe contener '@' y un dominio."
-            return false
-        }
-        if (password.length < 6) {
-            errorMessage = "La contraseña debe tener al menos 6 caracteres."
-            return false
-        }
-        errorMessage = ""
-        return true
-    }
+    var passwordVisible by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -54,57 +46,54 @@ fun LoginScreen(onLoginClick: () -> Unit, onNavigateToRegister: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Iniciar sesión en MediPet", style = MaterialTheme.typography.headlineMedium)
+
+        Text("Iniciar sesión", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Campo de Email
+        // EMAIL
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
             label = { Text("Correo electrónico") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo de Contraseña
+        // PASSWORD
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Contraseña") },
-            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                val icon = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = icon, contentDescription = "Toggle password visibility")
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                        contentDescription = null
+                    )
                 }
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth()
+            }
         )
 
-        
         if (errorMessage.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = errorMessage,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
-            )
+            Text(errorMessage, color = MaterialTheme.colorScheme.error)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Botón principal de Login
         Button(
             onClick = {
-                if (validarLogin()) {
-                    Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
-                    onLoginClick() // Esto ya funciona bien.
-                }
+                viewModel.login(
+                    email = email,
+                    password = password,
+                    onSuccess = { nombre ->
+                        Toast.makeText(context, "Bienvenido $nombre", Toast.LENGTH_SHORT).show()
+                        onLoginSuccess(nombre)
+                    },
+                    onError = { errorMessage = "Credenciales incorrectas $email $password" }
+                )
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -113,11 +102,7 @@ fun LoginScreen(onLoginClick: () -> Unit, onNavigateToRegister: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botón secundario para ir a la pantalla de Registro
-        TextButton(
-            onClick = onNavigateToRegister,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        TextButton(onClick = onNavigateToRegister) {
             Text("¿No tienes cuenta? Regístrate")
         }
     }

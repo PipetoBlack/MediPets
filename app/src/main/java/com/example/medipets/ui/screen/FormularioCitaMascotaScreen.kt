@@ -1,18 +1,14 @@
 package com.example.medipets.ui.screen
 
-import android.app.Application
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.medipets.ui.components.BackButton
 import com.example.medipets.ui.components.InputText
 import com.example.medipets.viewmodel.FormularioCitaMascotaViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -24,19 +20,15 @@ fun FormularioCitaMascotaScreen(
     viewModel: FormularioCitaMascotaViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Este bloque se ejecuta de forma segura solo una vez cuando la pantalla aparece.
-    LaunchedEffect(key1 = Unit) {
+    // Eventos del ViewModel
+    LaunchedEffect(Unit) {
         viewModel.eventoFlujo.collectLatest { evento ->
             when (evento) {
-                is FormularioCitaMascotaViewModel.Evento.MostrarSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        message = evento.mensaje,
-                        duration = SnackbarDuration.Short
-                    )
-                }
+                is FormularioCitaMascotaViewModel.Evento.MostrarSnackbar ->
+                    snackbarHostState.showSnackbar(evento.mensaje)
+
                 is FormularioCitaMascotaViewModel.Evento.NavegarAHome -> {
                     navController.navigate("home") {
                         popUpTo("home") { inclusive = true }
@@ -46,10 +38,9 @@ fun FormularioCitaMascotaScreen(
         }
     }
 
-    // lgica del Calendario (DatePicker)
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = System.currentTimeMillis()
-    )
+    // DatePicker
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = System.currentTimeMillis())
+
     if (uiState.mostrarDatePicker) {
         DatePickerDialog(
             onDismissRequest = { viewModel.onDismissDatePicker() },
@@ -61,19 +52,38 @@ fun FormularioCitaMascotaScreen(
                 }) { Text("Aceptar") }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.onDismissDatePicker() }) { Text("Cancelar") }
+                TextButton(onClick = { viewModel.onDismissDatePicker() }) {
+                    Text("Cancelar")
+                }
             }
         ) {
             DatePicker(state = datePickerState)
         }
     }
 
+    // =======================  SCAFFOLD  ===========================
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            TopAppBar(title = { Text("Agendar Cita para Mascota") })
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BackButton(onBack = { navController.popBackStack() })
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "Agendar Cita para Mascota",
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
         }
     ) { paddingValues ->
+
+        // =======================  CONTENIDO  ===========================
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -82,18 +92,21 @@ fun FormularioCitaMascotaScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+
             InputText(
                 valor = uiState.nombreMascota,
                 error = uiState.errores.nombreMascota,
                 label = "Nombre de la mascota",
                 onChange = viewModel::onNombreMascotaChange
             )
+
             InputText(
                 valor = uiState.raza,
                 error = uiState.errores.raza,
                 label = "Raza",
                 onChange = viewModel::onRazaChange
             )
+
             InputText(
                 valor = uiState.edad,
                 error = uiState.errores.edad,
@@ -101,6 +114,7 @@ fun FormularioCitaMascotaScreen(
                 onChange = viewModel::onEdadChange
             )
 
+            // Fecha → disabled y clickable
             Box(modifier = Modifier.clickable { viewModel.onShowDatePicker() }) {
                 InputText(
                     valor = uiState.fecha,
@@ -120,6 +134,7 @@ fun FormularioCitaMascotaScreen(
                 maxLines = 4
             )
 
+            // Empuja el botón al final
             Spacer(modifier = Modifier.weight(1f))
 
             Button(

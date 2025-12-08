@@ -109,13 +109,24 @@ fun MascotaProfileScreen(
         )
 
         OutlinedTextField(
-            value = estado.edad,
-            onValueChange = { viewModel.onEdadChange(it) },
+            value = estado.edadAnios,
+            onValueChange = { viewModel.onEdadAniosChange(it) },
             label = { Text("Edad (años)") },
             modifier = Modifier.fillMaxWidth(),
-            isError = estado.errores.edad != null,
+            isError = estado.errores.edadAnios != null,
             supportingText = {
-                estado.errores.edad?.let { Text(it) }
+                estado.errores.edadAnios?.let { Text(it) }
+            }
+        )
+
+        OutlinedTextField(
+            value = estado.edadMeses,
+            onValueChange = { viewModel.onEdadMesesChange(it) },
+            label = { Text("Edad (meses)") },
+            modifier = Modifier.fillMaxWidth(),
+            isError = estado.errores.edadMeses != null,
+            supportingText = {
+                estado.errores.edadMeses?.let { Text(it) }
             }
         )
 
@@ -173,7 +184,7 @@ fun MascotaProfileScreen(
                         Text("Nombre: ${mascota.nombre}")
                         Text("Tipo: ${mascota.tipo}")
                         Text("Raza: ${mascota.raza}")
-                        mascota.edad?.let { Text("Edad: $it años") }
+                        mascota.edadAnios?.let { Text("Edad: $it años y ${mascota.edadMeses} meses") }
                     }
                 }
             }

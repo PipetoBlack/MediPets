@@ -11,14 +11,16 @@ class MascotaRepository(
         nombre: String,
         tipo: String,
         raza: String,
-        edad: Int?,
+        edadAnios: Int?,
+        edadMeses: Int?,
         fotoUri: String?
     ) {
         val entity = MascotaEntity(
             nombre = nombre,
             tipo = tipo,
             raza = raza,
-            edad = edad,
+            edadAnios = edadAnios,
+            edadMeses = edadMeses,
             fotoUri = fotoUri
         )
         dao.insertarMascota(entity)

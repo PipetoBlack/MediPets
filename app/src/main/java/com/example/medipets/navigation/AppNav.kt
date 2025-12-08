@@ -10,13 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.medipets.model.data.config.AppDatabase
 import com.example.medipets.model.data.repository.FormularioCitaMascotaRepository
 import com.example.medipets.ui.screen.*
-import com.example.medipets.viewmodel.FormularioCitaMascotaViewModel
-import com.example.medipets.viewmodel.FormularioCitaMascotaViewModelFactory
-import com.example.medipets.viewmodel.VeterinarioViewModel
-import com.example.medipets.viewmodel.VeterinarioViewModelFactory
-import com.example.medipets.viewmodel.MascotaViewModel
-import com.example.medipets.viewmodel.MascotaViewModelFactory
-import com.example.medipets.ui.screen.MascotaProfileScreen
+import com.example.medipets.viewmodel.*
 
 @Composable
 fun AppNavigation() {
@@ -24,7 +18,7 @@ fun AppNavigation() {
 
     NavHost(navController = navController, startDestination = "menu") {
 
-        // Pantalla del Menú de Inicio
+        // MENU
         composable("menu") {
             MenuInicioScreen(
                 onLoginClick = { navController.navigate("login") },
@@ -32,34 +26,43 @@ fun AppNavigation() {
             )
         }
 
-        // Pantalla de Login
+        //Login
         composable("login") {
             LoginScreen(
-                onLoginClick = {
-                    navController.navigate("home") { popUpTo("menu") { inclusive = true } }
+                onLoginSuccess = { nombre ->
+                    navController.navigate("home/$nombre") {
+                        popUpTo("menu") { inclusive = true }
+                    }
                 },
                 onNavigateToRegister = {
-                    navController.navigate("register") // Esta es la navegación clave
+                    navController.navigate("register")
                 }
             )
         }
 
-        // Pantalla de Registro
+
+        // REGISTRO
         composable("register") {
             RegisterScreen(
-                onBackClick = { navController.popBackStack() }, // Volver a la pantalla anterior
+                onBackClick = { navController.popBackStack() },
                 onLoginClick = {
-                    navController.navigate("login") { popUpTo("register") { inclusive = true } }
+                    navController.navigate("login") {
+                        popUpTo("register") { inclusive = true }
+                    }
                 }
             )
         }
 
-        // Pantalla de Home
-        composable("home") {
+        // HOME CON NOMBRE
+        composable("home/{nombre}") { backStackEntry ->
+            val nombre = backStackEntry.arguments?.getString("nombre") ?: "Usuario"
+
             HomeScreen(
-                userName = "Felipe",
+                userName = nombre,
                 onLogoutClick = {
-                    navController.navigate("menu") { popUpTo("home") { inclusive = true } }
+                    navController.navigate("menu") {
+                        popUpTo("home/{nombre}") { inclusive = true }
+                    }
                 },
                 onAgendarClick = { navController.navigate("CitaMascota") },
                 onVeterinarioClick = { navController.navigate("veterinario") },
@@ -67,7 +70,7 @@ fun AppNavigation() {
             )
         }
 
-        // Pantalla de ingreso de Veterinario
+        // VETERINARIO
         composable("veterinario") {
             val context = LocalContext.current
             val viewModel: VeterinarioViewModel = viewModel(
@@ -76,7 +79,7 @@ fun AppNavigation() {
             VeterinarioProfileScreen(viewModel = viewModel, navController = navController)
         }
 
-        // Pantalla de la mascota
+        // MASCOTA
         composable("paciente") {
             val context = LocalContext.current
             val viewModel: MascotaViewModel = viewModel(
@@ -85,7 +88,7 @@ fun AppNavigation() {
             MascotaProfileScreen(viewModel = viewModel, navController = navController)
         }
 
-        // Pantalla de ingreso de Formulario cita
+        // FORMULARIO CITA
         composable("CitaMascota") {
             val application = LocalContext.current.applicationContext as Application
             val dao = AppDatabase.getDatabase(application).formularioCitaMascotaDao()

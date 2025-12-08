@@ -13,10 +13,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medipets.model.data.config.AppDatabase
+import com.example.medipets.model.data.repository.UsuarioRepository
+import com.example.medipets.viewmodel.RegistroViewModel
+import com.example.medipets.viewmodel.RegistroViewModelFactory
 
 @Composable
-fun RegisterScreen(onBackClick: () -> Unit, onLoginClick: () -> Unit) {
+fun RegisterScreen(
+    onBackClick: () -> Unit,
+    onLoginClick: () -> Unit
+) {
     val context = LocalContext.current
+
+    // Crear la BD + DAO + Repo + ViewModel
+    val db = remember { AppDatabase.getDatabase(context) }
+    val dao = db.usuarioDao()
+    val repo = UsuarioRepository(dao)
+
+    val viewModel: RegistroViewModel =
+        viewModel(factory = RegistroViewModelFactory(repo))
 
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -26,42 +42,12 @@ fun RegisterScreen(onBackClick: () -> Unit, onLoginClick: () -> Unit) {
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
-    var errorMessage by remember { mutableStateOf("") }
-    var successMessage by remember { mutableStateOf("") }
+    var localError by remember { mutableStateOf("") }
 
-    fun validarRegistro() {
-        errorMessage = ""
-        successMessage = ""
-
-        if (name.isBlank()) {
-            errorMessage = "El nombre no puede estar vacío."
-            return
-        }
-
-        if (!email.contains("@") || !email.contains(".")) {
-            errorMessage = "Correo inválido. Debe contener '@' y un dominio."
-            return
-        }
-
-        if (password.length < 6) {
-            errorMessage = "La contraseña debe tener al menos 6 caracteres."
-            return
-        }
-
-        if (password != confirmPassword) {
-            errorMessage = "Las contraseñas no coinciden."
-            return
-        }
-
-        // Si todo está bien, mostrar mensaje y limpiar campos
-        successMessage = "Se ha enviado un enlace de confirmación al correo."
-
-        name = ""
-        email = ""
-        password = ""
-        confirmPassword = ""
-        passwordVisible = false
-        confirmPasswordVisible = false
+    // Si el registro se completó → navegar al login
+    if (viewModel.registroExitoso) {
+        Toast.makeText(context, "Registro exitoso", Toast.LENGTH_LONG).show()
+        onLoginClick()
     }
 
     Column(
@@ -71,8 +57,6 @@ fun RegisterScreen(onBackClick: () -> Unit, onLoginClick: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Registro", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(24.dp))
 
         OutlinedTextField(
             value = name,
@@ -87,8 +71,7 @@ fun RegisterScreen(onBackClick: () -> Unit, onLoginClick: () -> Unit) {
             value = email,
             onValueChange = { email = it },
             label = { Text("Correo electrónico") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -100,12 +83,13 @@ fun RegisterScreen(onBackClick: () -> Unit, onLoginClick: () -> Unit) {
             singleLine = true,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                val icon = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = icon, contentDescription = null)
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                        contentDescription = null
+                    )
                 }
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -117,42 +101,50 @@ fun RegisterScreen(onBackClick: () -> Unit, onLoginClick: () -> Unit) {
             singleLine = true,
             visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                val icon = if (confirmPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
                 IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                    Icon(imageVector = icon, contentDescription = null)
+                    Icon(
+                        imageVector = if (confirmPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                        contentDescription = null
+                    )
                 }
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            }
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = {
-                validarRegistro()
-                if (successMessage.isNotEmpty()) {
-                    Toast.makeText(context, successMessage, Toast.LENGTH_LONG).show()
+                localError = ""
+
+                if (name.isBlank()) {
+                    localError = "El nombre no puede estar vacío."
+                    return@Button
                 }
+                if (!email.contains("@") || !email.contains(".")) {
+                    localError = "Correo inválido."
+                    return@Button
+                }
+                if (password.length < 6) {
+                    localError = "La contraseña debe tener al menos 6 caracteres."
+                    return@Button
+                }
+                if (password != confirmPassword) {
+                    localError = "Las contraseñas no coinciden."
+                    return@Button
+                }
+
+                viewModel.registrar(name, email, password)
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Registrarse")
         }
 
-        if (errorMessage.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
+        if (localError.isNotEmpty()) {
+            Text(localError, color = MaterialTheme.colorScheme.error)
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text("¿Ya tienes cuenta?")
-        TextButton(onClick = onLoginClick) {
-            Text("Iniciar sesión")
-        }
-
-        TextButton(onClick = onBackClick) {
-            Text("Volver")
+        if (viewModel.mensajeError != null) {
+            Text(viewModel.mensajeError!!, color = MaterialTheme.colorScheme.error)
         }
     }
 }

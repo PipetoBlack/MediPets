@@ -4,35 +4,28 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.medipets.model.data.dao.FormularioServicioDao
-import com.example.medipets.model.data.entities.FormularioCitaMascotaEntity
-import com.example.medipets.model.data.entities.FormularioServicioEntity
-import com.example.medipets.model.data.entities.VeterinarioEntity
-import com.example.medipets.model.data.dao.VeterinarioDao
-import com.example.medipets.model.data.dao.FormularioCitaMascotaDao
-import com.example.medipets.model.data.dao.MascotaDao
-import com.example.medipets.model.data.entities.MascotaEntity
+
+import com.example.medipets.model.data.dao.*
+import com.example.medipets.model.data.entities.*
+
 
 @Database(
-    entities = [FormularioServicioEntity::class,
-                FormularioCitaMascotaEntity::class,
-                VeterinarioEntity::class,
-                MascotaEntity::class
-               ],
-    version = 4, // Si cambias el esquema, aumenta el número de versión
-    exportSchema = false // Buena práctica para evitar warnings
+    entities = [
+        FormularioCitaMascotaEntity::class,
+        VeterinarioEntity::class,
+        MascotaEntity::class,
+        UsuarioEntity::class
+    ],
+    version = 10,
+    exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    // ¡ESTA ES LA LÍNEA QUE DEBES AÑADIR EN ESTE ARCHIVO!
-    abstract fun formularioServicioDao(): FormularioServicioDao
     abstract fun formularioCitaMascotaDao(): FormularioCitaMascotaDao
-
     abstract fun veterinarioDao(): VeterinarioDao
-
     abstract fun mascotaDao(): MascotaDao
+    abstract fun usuarioDao(): UsuarioDao
 
-    // Y el companion object para crear la base de datos
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
@@ -42,8 +35,11 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "app_db"
-                ).build()
+                        "medipets.db"
+                )
+                    .fallbackToDestructiveMigration()  // 👈 ahora sí se aplica
+                    .build()
+
                 INSTANCE = instance
                 instance
             }

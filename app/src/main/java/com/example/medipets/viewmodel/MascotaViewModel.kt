@@ -68,13 +68,24 @@ class MascotaViewModel(
         }
     }
 
-    fun onEdadChange(valor: String) {
+    fun onEdadAniosChange(valor: String) {
         _estado.update { actual ->
             actual.copy(
-                edad = valor,
+                edadAnios = valor,
                 errores = actual.errores.copy(
-                    edad = if (valor.isNotBlank() && valor.toIntOrNull() == null)
-                        "Debe ser un número" else null
+                    edadAnios = if (valor.isNotBlank() && valor.toIntOrNull() == null)
+                        "Debe ser un número o un 0" else null
+                )
+            )
+        }
+    }
+    fun onEdadMesesChange(valor: String) {
+        _estado.update { actual ->
+            actual.copy(
+                edadMeses = valor,
+                errores = actual.errores.copy(
+                    edadMeses = if (valor.isNotBlank() && valor.toIntOrNull() == null)
+                        "Debe ser un número o un 0" else null
                 )
             )
         }
@@ -91,7 +102,9 @@ class MascotaViewModel(
             nombre = if (ui.nombre.isBlank()) "El nombre es obligatorio" else null,
             tipo   = if (ui.tipo.isBlank()) "El tipo es obligatorio" else null,
             raza   = if (ui.raza.isBlank()) "La raza es obligatoria" else null,
-            edad   = if (ui.edad.isNotBlank() && ui.edad.toIntOrNull() == null)
+            edadAnios   = if (ui.edadAnios.isNotBlank() && ui.edadAnios.toIntOrNull() == null)
+                "Edad inválida" else null,
+            edadMeses   = if (ui.edadMeses.isNotBlank() && ui.edadMeses.toIntOrNull() == null)
                 "Edad inválida" else null
         )
 
@@ -104,7 +117,8 @@ class MascotaViewModel(
                 nombre = ui.nombre,
                 tipo = ui.tipo,
                 raza = ui.raza,
-                edad = ui.edad.toIntOrNull(),
+                edadAnios = ui.edadAnios.toIntOrNull(),
+                edadMeses = ui.edadAnios.toIntOrNull(),
                 fotoUri = ui.fotoUri
             )
             _estado.value = MascotaUIState()
