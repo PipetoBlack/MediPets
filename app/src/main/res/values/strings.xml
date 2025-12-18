@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MediPets</string>
+    <!-- Mensajes de Error que debes añadir -->
+    <string name="error_campo_obligatorio">Este campo es obligatorio</string>
+    <string name="error_region_obligatoria">La región es obligatoria</string>
+    <string name="error_formato_correo">El formato del correo no es válido</string>
 </resources>
