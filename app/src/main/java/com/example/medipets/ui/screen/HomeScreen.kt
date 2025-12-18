@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medipets.model.domain.WeatherUIState
+import com.example.medipets.ui.components.WeatherCard
 import com.example.medipets.ui.components.WeatherTopBar
 import com.example.medipets.viewmodel.WeatherViewModel
 import com.example.medipets.viewmodel.WeatherViewModelFactory
@@ -32,92 +33,66 @@ fun HomeScreen(
     onVeterinarioClick: () -> Unit,
     onPacienteClick: () -> Unit
 ) {
-    // ✅ 1. Instanciamos el ViewModel del clima
-    val weatherViewModel: WeatherViewModel = viewModel(
-        factory = WeatherViewModelFactory()
-    )
-
-    // ✅ 2. Obtenemos el estado del clima
+    val weatherViewModel: WeatherViewModel = viewModel(factory = WeatherViewModelFactory())
     val weatherState = weatherViewModel.uiState
 
-    // ✅ 3. Cargar clima al entrar a la pantalla
     LaunchedEffect(Unit) {
         weatherViewModel.loadWeather("Santiago")
     }
 
-    Scaffold(
-        topBar = {
-            // ✅ 4. Integramos WeatherTopBar + tu saludo + botón salir
-            WeatherTopBar(
-                state = weatherState,
-                onRefreshClick = { weatherViewModel.loadWeather("Santiago") },
-                extraContent = {
-                    // ✅ Aquí va tu TopAppBar original, sin tocarlo
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Hola, $userName",
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-
-                        Spacer(Modifier.width(12.dp))
-
-                        TextButton(onClick = onLogoutClick) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.ExitToApp,
-                                    contentDescription = "Cerrar sesión"
-                                )
-                                Spacer(Modifier.width(4.dp))
-                                Text(text = "Salir")
-                            }
-                        }
-                    }
-                }
-            )
-        }
-    ) { innerPadding ->
+    Scaffold { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Button(
-                onClick = onAgendarClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp)
+            // ✅ Saludo + botón salir
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Agendar Cita", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = "Hola, $userName",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                TextButton(onClick = onLogoutClick) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Default.ExitToApp, contentDescription = "Cerrar sesión")
+                        Spacer(Modifier.width(4.dp))
+                        Text("Salir")
+                    }
+                }
             }
 
-            Spacer(modifier = Modifier.padding(8.dp))
+            // ✅ Clima como card
+            WeatherCard(state = weatherState)
+
+            // ✅ Botones
+            Button(
+                onClick = onAgendarClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Agendar Cita", style = MaterialTheme.typography.titleMedium)
+            }
 
             Button(
                 onClick = onVeterinarioClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Registro Veterinario", style = MaterialTheme.typography.titleMedium)
+                Text("Registro Veterinario", style = MaterialTheme.typography.titleMedium)
             }
-
-            Spacer(modifier = Modifier.padding(8.dp))
 
             Button(
                 onClick = onPacienteClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Perfil Mascota", style = MaterialTheme.typography.titleMedium)
+                Text("Perfil Mascota", style = MaterialTheme.typography.titleMedium)
             }
         }
     }
 }
+
