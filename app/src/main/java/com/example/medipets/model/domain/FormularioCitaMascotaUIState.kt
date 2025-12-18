@@ -1,26 +1,23 @@
 package com.example.medipets.model.domain
 
 import androidx.annotation.StringRes
+import com.example.medipets.model.data.entities.MascotaEntity
+import com.example.medipets.model.data.entities.VeterinarioEntity
 
-// aqui se guarda los datos que el usuario está rellenado del formulario
+// Guarda los datos del formulario mientras el usuario los completa
 data class FormularioCitaMascotaUIState(
-    val formulario_servicio_id: Long? = null, // Para saber a qué servicio pertenece
-    val nombreMascota: String = "",
-    val raza: String = "",
-    val edad: String = "",
+    val formulario_servicio_id: Long? = null,
+    val mascotaSeleccionada: MascotaEntity? = null,
+    val veterinarioSeleccionado: VeterinarioEntity? = null,
     val fecha: String = "",
     val motivo: String = "",
-    val errores: CitaMascotaErrores = CitaMascotaErrores(),
-
-    val mostrarDatePicker: Boolean = false
-
+    val mostrarDatePicker: Boolean = false,
+    val errores: CitaMascotaErrores = CitaMascotaErrores()
 )
 
-// guarda los posibles errores de validación de cada campo.
+// Guarda los posibles errores de validación
 data class CitaMascotaErrores(
-    @StringRes val nombreMascota: Int? = null,
-    @StringRes val raza: Int? = null,
-    @StringRes val edad: Int? = null,
-    @StringRes val fecha: Int? = null,
-    @StringRes val motivo: Int? = null,
+    val mascota: Int? = null,
+    val fecha: Int? = null,
+    val motivo: Int? = null
 )

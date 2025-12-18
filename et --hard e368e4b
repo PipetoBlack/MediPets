@@ -1,0 +1,41 @@
+[33m82135ca[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/formulario-cita-medica[m[33m, [m[1;31morigin/dev[m[33m, [m[1;31morigin/apiClima[m[33m, [m[1;32mdev[m[33m)[m HEAD@{0}: merge dev: Fast-forward
+[33m476bbd2[m[33m ([m[1;31morigin/feature/formulario-cita-medica[m[33m)[m HEAD@{1}: checkout: moving from dev to feature/formulario-cita-medica
+[33m82135ca[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/formulario-cita-medica[m[33m, [m[1;31morigin/dev[m[33m, [m[1;31morigin/apiClima[m[33m, [m[1;32mdev[m[33m)[m HEAD@{2}: reset: moving to HEAD
+[33m82135ca[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/formulario-cita-medica[m[33m, [m[1;31morigin/dev[m[33m, [m[1;31morigin/apiClima[m[33m, [m[1;32mdev[m[33m)[m HEAD@{3}: checkout: moving from dev to dev
+[33m82135ca[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/formulario-cita-medica[m[33m, [m[1;31morigin/dev[m[33m, [m[1;31morigin/apiClima[m[33m, [m[1;32mdev[m[33m)[m HEAD@{4}: checkout: moving from master to dev
+[33ma525b3e[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{5}: checkout: moving from dev to master
+[33m82135ca[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/formulario-cita-medica[m[33m, [m[1;31morigin/dev[m[33m, [m[1;31morigin/apiClima[m[33m, [m[1;32mdev[m[33m)[m HEAD@{6}: pull: Fast-forward
+[33m1d5c6f8[m HEAD@{7}: checkout: moving from fix/reserva-cita-medica to dev
+[33me368e4b[m[33m ([m[1;31morigin/fix/reserva-cita-medica[m[33m, [m[1;32mfix/reserva-cita-medica[m[33m)[m HEAD@{8}: commit: Se intefra reserva de cita de mascota fcormulario que deja optar por la mascota y el veterinario
+[33m1d5c6f8[m HEAD@{9}: checkout: moving from dev to fix/reserva-cita-medica
+[33m1d5c6f8[m HEAD@{10}: merge fix/reserva-cita-medica: Fast-forward
+[33m6cc4448[m HEAD@{11}: checkout: moving from fix/reserva-cita-medica to dev
+[33m1d5c6f8[m HEAD@{12}: commit: Fix registro de usuario
+[33m6119392[m[33m ([m[1;31morigin/feature/imagenes-pacientes[m[33m, [m[1;32mfeature/imagenes-pacientes[m[33m)[m HEAD@{13}: merge origin/feature/imagenes-pacientes: Fast-forward
+[33m6cc4448[m HEAD@{14}: checkout: moving from feature/imagenes-pacientes to fix/reserva-cita-medica
+[33m6119392[m[33m ([m[1;31morigin/feature/imagenes-pacientes[m[33m, [m[1;32mfeature/imagenes-pacientes[m[33m)[m HEAD@{15}: pull: Fast-forward
+[33m642faae[m HEAD@{16}: checkout: moving from fix/reserva-cita-medica to feature/imagenes-pacientes
+[33m6cc4448[m HEAD@{17}: reset: moving to HEAD
+[33m6cc4448[m HEAD@{18}: checkout: moving from dev to fix/reserva-cita-medica
+[33m6cc4448[m HEAD@{19}: commit (merge): Se entrega primera parte del proyecto
+[33m207d099[m HEAD@{20}: commit: Correccion codigo, limpieza general
+[33me4dad0f[m HEAD@{21}: checkout: moving from RegistroLogin to dev
+[33me3463e0[m[33m ([m[1;31morigin/RegistroLogin[m[33m, [m[1;32mRegistroLogin[m[33m)[m HEAD@{22}: checkout: moving from dev to RegistroLogin
+[33me4dad0f[m HEAD@{23}: checkout: moving from RegistroLogin to dev
+[33me3463e0[m[33m ([m[1;31morigin/RegistroLogin[m[33m, [m[1;32mRegistroLogin[m[33m)[m HEAD@{24}: checkout: moving from dev to RegistroLogin
+[33me4dad0f[m HEAD@{25}: checkout: moving from feature/formulario-cita-medica to dev
+[33m476bbd2[m[33m ([m[1;31morigin/feature/formulario-cita-medica[m[33m)[m HEAD@{26}: commit (merge): Se enlaza el formulario de cita para mascota con el boton de homeScreen
+[33m55ab077[m HEAD@{27}: checkout: moving from dev to feature/formulario-cita-medica
+[33me4dad0f[m HEAD@{28}: reset: moving to origin/dev
+[33mad01e6a[m HEAD@{29}: pull: Fast-forward
+[33me3463e0[m[33m ([m[1;31morigin/RegistroLogin[m[33m, [m[1;32mRegistroLogin[m[33m)[m HEAD@{30}: pull: Fast-forward
+[33m2e36363[m[33m ([m[1;31morigin/registroForm[m[33m, [m[1;31morigin/estructuraBase[m[33m, [m[1;32mestructuraBase[m[33m)[m HEAD@{31}: checkout: moving from feature/formulario-cita-medica to dev
+[33m55ab077[m HEAD@{32}: commit: Se entrega formulario con reglas de negocio. tambien se carga visualmente un calendario para faciliar el uso para el usuario
+[33mc11ab55[m HEAD@{33}: commit: Se agrega formulario para citas medicas de mascotas.
+[33m67244c5[m HEAD@{34}: commit: Se mejora error de manifest y pasamos de katp a ktp. luego se mejoró la logica de los formularios ya existentes
+[33m2e36363[m[33m ([m[1;31morigin/registroForm[m[33m, [m[1;31morigin/estructuraBase[m[33m, [m[1;32mestructuraBase[m[33m)[m HEAD@{35}: Branch: renamed refs/heads/feature/formulario- to refs/heads/feature/formulario-cita-medica
+[33m2e36363[m[33m ([m[1;31morigin/registroForm[m[33m, [m[1;31morigin/estructuraBase[m[33m, [m[1;32mestructuraBase[m[33m)[m HEAD@{37}: checkout: moving from dev to feature/formulario-
+[33m2e36363[m[33m ([m[1;31morigin/registroForm[m[33m, [m[1;31morigin/estructuraBase[m[33m, [m[1;32mestructuraBase[m[33m)[m HEAD@{38}: checkout: moving from estructuraBase to dev
+[33m2e36363[m[33m ([m[1;31morigin/registroForm[m[33m, [m[1;31morigin/estructuraBase[m[33m, [m[1;32mestructuraBase[m[33m)[m HEAD@{39}: checkout: moving from dev to estructuraBase
+[33m2e36363[m[33m ([m[1;31morigin/registroForm[m[33m, [m[1;31morigin/estructuraBase[m[33m, [m[1;32mestructuraBase[m[33m)[m HEAD@{40}: checkout: moving from master to dev
+[33ma525b3e[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{41}: clone: from https://github.com/PipetoBlack/MediPets.git
