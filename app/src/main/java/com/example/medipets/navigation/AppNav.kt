@@ -9,6 +9,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.medipets.model.data.config.AppDatabase
 import com.example.medipets.model.data.repository.FormularioCitaMascotaRepository
+import com.example.medipets.model.data.repository.MascotaRepository
+import com.example.medipets.model.data.repository.VeterinarioRepository
 import com.example.medipets.ui.screen.*
 import com.example.medipets.viewmodel.*
 
@@ -90,10 +92,19 @@ fun AppNavigation() {
 
         // FORMULARIO CITA
         composable("CitaMascota") {
-            val application = LocalContext.current.applicationContext as Application
-            val dao = AppDatabase.getDatabase(application).formularioCitaMascotaDao()
-            val repository = FormularioCitaMascotaRepository(dao)
-            val factory = FormularioCitaMascotaViewModelFactory(repository)
+            val context = LocalContext.current
+            val db = AppDatabase.getDatabase(context)
+
+            val formularioRepo = FormularioCitaMascotaRepository(db.formularioCitaMascotaDao())
+            val mascotaRepo = MascotaRepository(db.mascotaDao())
+            val veterinarioRepo = VeterinarioRepository(db.veterinarioDao())
+
+            val factory = FormularioCitaMascotaViewModelFactory(
+                formularioRepo,
+                mascotaRepo,
+                veterinarioRepo
+            )
+
             val viewModel: FormularioCitaMascotaViewModel = viewModel(factory = factory)
 
             FormularioCitaMascotaScreen(
@@ -101,5 +112,7 @@ fun AppNavigation() {
                 viewModel = viewModel
             )
         }
+
+
     }
 }

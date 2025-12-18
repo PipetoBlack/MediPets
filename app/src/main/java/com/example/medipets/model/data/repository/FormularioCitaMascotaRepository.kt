@@ -5,9 +5,18 @@ import com.example.medipets.model.data.entities.FormularioCitaMascotaEntity
 
 class FormularioCitaMascotaRepository(private val dao: FormularioCitaMascotaDao) {
 
-    suspend fun insert(cita: FormularioCitaMascotaEntity) {
-        dao.insert(cita)
+    // Insertar nueva cita
+    suspend fun agendarCita(cita: FormularioCitaMascotaEntity) {
+        dao.insertar(cita)
     }
 
-    // se puede añadir nuevas funciones aquí. como getAll() en tu DAO
+    // Obtener todas las citas de un usuario
+    suspend fun obtenerCitasPorUsuario(usuarioId: Long): List<FormularioCitaMascotaEntity> {
+        return dao.obtenerCitasPorUsuario(usuarioId)
+    }
+
+    // Obtener citas con detalle (mascota + veterinario)
+    suspend fun obtenerCitasConDetalle(usuarioId: Long): List<FormularioCitaMascotaEntity> {
+        return dao.obtenerCitasConDetalle(usuarioId)
+    }
 }
