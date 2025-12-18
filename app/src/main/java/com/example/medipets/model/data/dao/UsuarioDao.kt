@@ -10,6 +10,9 @@ interface UsuarioDao {
     @Insert
     suspend fun insertar(usuario: UsuarioEntity)
 
+    @Query("SELECT * FROM usuarios")
+    suspend fun getAll(): List<UsuarioEntity>
+
     // BUSCAR USUARIO POR EMAIL
     @Query("SELECT * FROM usuarios WHERE email = :email LIMIT 1")
     suspend fun getUsuarioByEmail(email: String): UsuarioEntity?

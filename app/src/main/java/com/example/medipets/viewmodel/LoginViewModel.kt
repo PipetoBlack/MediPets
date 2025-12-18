@@ -1,6 +1,7 @@
 package com.example.medipets.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medipets.model.data.config.AppDatabase
@@ -35,14 +36,22 @@ class LoginViewModel(
         onError: () -> Unit
     ) {
         viewModelScope.launch {
-            val usuario = dao.login(email, password) // O dao.findUser(email)
+            try {
+                val usuario = dao.login(email.trim(), password.trim())
 
-            if (usuario != null && usuario.password == password) {
-                onSuccess(usuario.nombre)
-            } else {
+                if (usuario != null) {
+                    onSuccess(usuario.nombre)
+                } else {
+                    onError()
+                }
+
+            } catch (e: Exception) {
+                // Log para debug si algo explota
+                Log.e("LoginViewModel", "Error en login: ${e.message}", e)
                 onError()
             }
         }
     }
+
 
 }

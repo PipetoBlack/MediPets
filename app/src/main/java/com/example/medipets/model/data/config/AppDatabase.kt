@@ -4,10 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.medipets.model.data.dao.*
 import com.example.medipets.model.data.entities.*
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Database(
     entities = [
@@ -32,12 +34,29 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
+
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                        "medipets.db"
+                    "medipets.db"
                 )
-                    .fallbackToDestructiveMigration()  // 👈 ahora sí se aplica
+                    .fallbackToDestructiveMigration()
+                    .addCallback(object : RoomDatabase.Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val dao = getDatabase(context).usuarioDao()
+                                dao.insertar(
+                                    UsuarioEntity(
+                                        nombre = "Felipe",
+                                        email = "felipe@duoc.cl",
+                                        password = "Kawazaki7991+"
+                                    )
+                                )
+                            }
+                        }
+                    })
                     .build()
 
                 INSTANCE = instance
