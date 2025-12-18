@@ -18,8 +18,8 @@ import kotlinx.coroutines.launch
         MascotaEntity::class,
         UsuarioEntity::class
     ],
-    version = 10,
-    exportSchema = true
+    version = 15,
+    exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -40,20 +40,43 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "medipets.db"
                 )
+                    // ⚠️ QUITA fallbackToDestructiveMigration DURANTE DESARROLLO
                     .fallbackToDestructiveMigration()
+
                     .addCallback(object : RoomDatabase.Callback() {
+
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
 
+                            // Se ejecuta SOLO la primera vez que se crea la BD
                             CoroutineScope(Dispatchers.IO).launch {
-                                val dao = getDatabase(context).usuarioDao()
-                                dao.insertar(
-                                    UsuarioEntity(
-                                        nombre = "Felipe",
-                                        email = "felipe@duoc.cl",
-                                        password = "Kawazaki7991+"
+
+                                // ⚠️ USAMOS LA INSTANCIA, NO INSTANCE (que aún es null)
+                                getDatabase(context).apply {
+
+                                    // Mascota de prueba
+                                    mascotaDao().insertarMascota(
+                                        MascotaEntity(
+                                            nombre = "Firulais",
+                                            tipo = "Perro",
+                                            raza = "Mestizo",
+                                            edadAnios = 3,
+                                            edadMeses = 0,
+                                            fotoUri = null
+                                        )
                                     )
-                                )
+
+                                    // Veterinario de prueba
+                                    veterinarioDao().insertarVeterinario(
+                                        VeterinarioEntity(
+                                            nombre = "Dr. Carlos",
+                                            especialidad = "General",
+                                            correo = "carlos@vet.com",
+                                            telefono = "123456789"
+                                        )
+                                    )
+
+                                }
                             }
                         }
                     })
