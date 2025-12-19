@@ -3,6 +3,7 @@ package com.example.medipets.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medipets.model.data.entities.MascotaEntity
+import com.example.medipets.model.data.network.RetrofitClient
 import com.example.medipets.model.data.repository.MascotaRepository
 import com.example.medipets.model.domain.MascotaErrores
 import com.example.medipets.model.domain.MascotaUIState
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -30,6 +32,24 @@ class MascotaViewModel(
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = emptyList()
             )
+    private val _razasBackend = MutableStateFlow<List<String>>(emptyList())
+    val razasBackend: StateFlow<List<String>> = _razasBackend.asStateFlow()
+
+    private val _estaCargando = MutableStateFlow(false)
+    val estaCargando: StateFlow<Boolean> = _estaCargando.asStateFlow()
+
+
+    init {
+        sincronizarRemoto()
+    }
+
+    private fun sincronizarRemoto() {
+        viewModelScope.launch {
+            _estaCargando.value = true
+            repository.sincronizarConBackend()
+            _estaCargando.value = false
+        }
+    }
 
     // ---------- HANDLERS DE FORMULARIO ----------
     fun onNombreChange(valor: String) {
@@ -62,6 +82,21 @@ class MascotaViewModel(
                     raza = if (valor.isBlank()) "La raza es obligatoria" else null
                 )
             )
+        }
+    }
+
+    fun cargarRazas(tipo: String) {
+        viewModelScope.launch {
+            try {
+                _estaCargando.value = true
+                // Llamamos a tu API de Spring Boot
+                val lista = RetrofitClient.instance.obtenerRazas(tipo)
+                _razasBackend.value = lista
+            } catch (e: Exception) {
+                _razasBackend.value = listOf("Mestizo") // Fallback por si falla el servidor
+            } finally {
+                _estaCargando.value = false
+            }
         }
     }
 
@@ -99,9 +134,10 @@ class MascotaViewModel(
 
         val errores = MascotaErrores(
             nombre = if (ui.nombre.isBlank()) "El nombre es obligatorio" else null,
-            tipo = if (ui.tipo.isBlank()) "El tipo es obligatorio" else null,
-            raza = if (ui.raza.isBlank()) "La raza es obligatoria" else null,
-            edadAnios = if (ui.edadAnios.isNotBlank() && ui.edadAnios.toIntOrNull() == null)
+            tipo   = if (ui.tipo.isBlank()) "El tipo es obligatorio" else null,
+            raza   = if (ui.raza.isBlank()) "La raza es obligatoria" else null,
+            foto = if (ui.fotoUri == null) "La foto es obligatoria" else null,
+            edadAnios   = if (ui.edadAnios.isNotBlank() && ui.edadAnios.toIntOrNull() == null)
                 "Edad inválida" else null,
             edadMeses = if (ui.edadMeses.isNotBlank() && ui.edadMeses.toIntOrNull() == null)
                 "Edad inválida" else null
@@ -112,13 +148,16 @@ class MascotaViewModel(
         if (errores.tieneErrores()) return
 
         viewModelScope.launch {
+            _estaCargando.value = true
+            // Esta función ahora guarda en Room e intenta enviar a Railway
             repository.guardarMascota(
                 nombre = ui.nombre,
                 tipo = ui.tipo,
                 raza = ui.raza,
                 edadAnios = ui.edadAnios.toIntOrNull(),
                 edadMeses = ui.edadMeses.toIntOrNull(),
-                fotoUri = ui.fotoUri
+                fotoUri = ui.fotoUri,
+                clienteId = 1L
             )
             _estado.value = MascotaUIState()
         }

@@ -19,8 +19,9 @@ import kotlinx.coroutines.launch
         UsuarioEntity::class
     ],
     version = 15,
-    exportSchema = false
+    exportSchema = true
 )
+
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun formularioCitaMascotaDao(): FormularioCitaMascotaDao
@@ -50,33 +51,14 @@ abstract class AppDatabase : RoomDatabase() {
 
                             // Se ejecuta SOLO la primera vez que se crea la BD
                             CoroutineScope(Dispatchers.IO).launch {
-
-                                // ⚠️ USAMOS LA INSTANCIA, NO INSTANCE (que aún es null)
-                                getDatabase(context).apply {
-
-                                    // Mascota de prueba
-                                    mascotaDao().insertarMascota(
-                                        MascotaEntity(
-                                            nombre = "Firulais",
-                                            tipo = "Perro",
-                                            raza = "Mestizo",
-                                            edadAnios = 3,
-                                            edadMeses = 0,
-                                            fotoUri = null
-                                        )
+                                val dao = getDatabase(context).usuarioDao()
+                                dao.insertar(
+                                    UsuarioEntity(
+                                        nombre = "Felipe",
+                                        email = "felipe@duoc.cl",
+                                        password = "Kawazaki7991+"
                                     )
-
-                                    // Veterinario de prueba
-                                    veterinarioDao().insertarVeterinario(
-                                        VeterinarioEntity(
-                                            nombre = "Dr. Carlos",
-                                            especialidad = "General",
-                                            correo = "carlos@vet.com",
-                                            telefono = "123456789"
-                                        )
-                                    )
-
-                                }
+                                )
                             }
                         }
                     })

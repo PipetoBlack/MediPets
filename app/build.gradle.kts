@@ -1,3 +1,4 @@
+import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,6 +9,11 @@ plugins {
 android {
     namespace = "com.example.medipets"
     compileSdk = 36
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(localPropertiesFile.inputStream())
+    }
 
     defaultConfig {
         applicationId = "com.example.medipets"
@@ -17,6 +23,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "BACKEND_URL", "\"${localProperties.getProperty("BACKEND_URL")}\"")
     }
 
     buildTypes {
@@ -31,6 +38,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
@@ -45,6 +53,7 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
 }
 
 dependencies {
@@ -57,6 +66,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    // Retrofit para las peticiones HTTP
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // Converter para transformar JSON a objetos Kotlin
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
 
 
     // INICIO API
