@@ -171,7 +171,7 @@ fun FormularioCitaMascotaScreen(
                     error = uiState.errores.fecha,
                     label = "Fecha de la cita",
                     onChange = {},
-                    enabled = true
+                    enabled = false
                 )
             }
 
