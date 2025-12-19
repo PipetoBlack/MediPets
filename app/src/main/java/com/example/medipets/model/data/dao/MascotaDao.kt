@@ -24,4 +24,7 @@ interface MascotaDao {
 
     @Query("DELETE FROM mascota WHERE id = :idMascota")
     suspend fun eliminarMascotaPorId(idMascota: Long)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertarMascotas(mascotas: List<MascotaEntity>)
 }
